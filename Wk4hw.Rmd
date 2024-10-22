@@ -1,11 +1,9 @@
 ---
-title: "R Notebook"
+title: "Difference in Gender Inequality Index by Country"
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
 
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
 
 ```{r}
 library(countrycode)
@@ -21,7 +19,10 @@ library(fs)
 library(janitor)
 library(tmap)
 library(tmaptools)
+library(ggplot2)
 ```
+
+
 ```{r}
 
 #read in world countries simple features
@@ -56,12 +57,20 @@ qtm(world_countries_difference_gii,
     fill.style="kmeans",
     midpoint= 0,
     borders = NULL)
+
+ggplot(world_countries_difference_gii, aes(fill = difference)) +
+  geom_sf() +
+  scale_fill_gradient2("Difference in Points",   low = "green",
+  mid = "white",
+  high = "red",
+  midpoint = 0,) +
+  theme_minimal() +
+  labs(
+    title = "Difference in Gender Inequality Index, 2010-2019",
+    subtitle = "UN Human Development Reports",
+    caption = "Lower score correlates with lower inequality. \nSource: https://hdr.undp.org/data-center/documentation-and-downloads"
+  )  
 ```
 
-
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+These show the change in gender equality by country, as measured by Gender Inequality Index.
 
