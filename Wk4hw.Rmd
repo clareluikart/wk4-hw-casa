@@ -8,6 +8,7 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
 
 ```{r}
+library(countrycode)
 library(usethis)
 library(rmarkdown)
 library(knitr)
@@ -17,15 +18,44 @@ library(tidyverse)
 library(broom)
 library(sf)
 library(fs)
-library(usethis)
+library(janitor)
+library(tmap)
+library(tmaptools)
 ```
 ```{r}
-world_countries <- here::here("World_Countries_(Generalized)_9029012925078512962.geojson")
-inequality <- read_csv(here("HDR23-24_Composite_indices_complete_time_series.csv"))
-inequality %>%
-  select(iso3, gii_2019, gii_2010) %>%
-  mutate(difference = gii_2019 - gii_2010)
 
+#read in world countries simple features
+world_countries <- read_sf(here("World_Countries_(Generalized)_9029012925078512962.geojson"))
+
+# read in inequality data
+inequality <- read_csv(here("HDR23-24_Composite_indices_complete_time_series.csv"))
+
+# create data frame of just what we need
+inequality_2010_2019 <- select(inequality, country, iso3, gii_2019, gii_2010)
+
+# create column for difference in gii
+inequality_2010_2019 <- inequality_2010_2019 %>%
+  clean_names(.,) %>%
+  rename(., iso = iso3) %>%
+  select(iso, gii_2019, gii_2010) %>%
+  mutate(., difference = gii_2019 - gii_2010)
+
+# clean names world_countries
+world_countries <- clean_names(world_countries)
+
+# change country code in world countries to iso3
+world_countries$iso <- countrycode(world_countries$iso, "iso2c", "iso3c")
+
+# join data
+world_countries_difference_gii <- left_join(world_countries, inequality_2010_2019, by="iso")
+
+# plot data
+qtm(world_countries_difference_gii,
+    fill="difference",
+    fill.n=10,
+    fill.style="kmeans",
+    midpoint= 0,
+    borders = NULL)
 ```
 
 
