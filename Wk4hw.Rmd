@@ -1,8 +1,7 @@
 ---
 title: "Difference in Gender Inequality Index by Country"
-output: html_notebook
+output: pdf_document
 ---
-
 
 
 ```{r}
@@ -20,6 +19,7 @@ library(janitor)
 library(tmap)
 library(tmaptools)
 library(ggplot2)
+library(dplyr)
 ```
 
 
@@ -74,3 +74,18 @@ ggplot(world_countries_difference_gii, aes(fill = difference)) +
 
 These show the change in gender equality by country, as measured by Gender Inequality Index.
 
+```{r}
+positive_difference <- dplyr::filter(world_countries_difference_gii, difference>0)
+positive_difference
+```
+
+Only `` `r nrow(positive_difference)` `` countries had higher inequality in 2019 than 2010.
+
+```{r}
+negative_difference <- dplyr::filter(world_countries_difference_gii, difference<=0 & !is.na(difference)) %>%
+  arrange(., difference)
+top_negative_difference <- head(negative_difference)$country
+```
+
+The following countries, in order, had the largest improvements in inequality.
+`` `r top_negative_difference` ``
